@@ -19,9 +19,10 @@ interface Props {
   onExit: () => void
   isMuted: boolean
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>
+  isSharedLink?: boolean
 }
 
-export default function MuseumGallery({ cfg, onExit, isMuted, setIsMuted }: Props) {
+export default function MuseumGallery({ cfg, onExit, isMuted, setIsMuted, isSharedLink = false }: Props) {
   const [slide, setSlide] = useState(0)
   const [letterOpen, setLetterOpen] = useState(false)
   const [quizOpen, setQuizOpen] = useState(false)
@@ -153,13 +154,15 @@ export default function MuseumGallery({ cfg, onExit, isMuted, setIsMuted }: Prop
           borderBottom: `1px solid ${theme.accent}18`,
         }}
       >
-        <button
-          onClick={onExit}
-          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] md:text-xs font-semibold text-white/70 hover:text-white transition-all hover:bg-white/5"
-          style={{ border: '1px solid rgba(255,255,255,0.1)' }}
-        >
-          ← Painel
-        </button>
+        {!isSharedLink && (
+          <button
+            onClick={onExit}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] md:text-xs font-semibold text-white/70 hover:text-white transition-all hover:bg-white/5 animate-fade-in"
+            style={{ border: '1px solid rgba(255,255,255,0.1)' }}
+          >
+            ← Painel
+          </button>
+        )}
 
         <div className="flex flex-col items-center min-w-0">
           <span

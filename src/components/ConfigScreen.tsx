@@ -7,6 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { ScrollArea } from './ui/scroll-area'
 import ChibiCanvas from './ChibiCanvas'
 import LivePreview from './LivePreview'
+import { Dialog, DialogContent } from './ui/dialog'
+import { serializeConfig } from '../lib/sharing'
+import { audioManager } from '../lib/audio'
 
 interface Props { onStart: (cfg: MuseumConfig) => void }
 
@@ -61,6 +64,33 @@ export default function ConfigScreen({ onStart }: Props) {
   const [cfg, setCfg] = useState<MuseumConfig>(DEFAULT_CONFIG)
   const [openPhoto, setOpenPhoto] = useState<number>(0)
   const fileRefs = useRef<(HTMLInputElement | null)[]>([])
+
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
+  const [shareUrl, setShareUrl] = useState('')
+  const [copied, setCopied] = useState(false)
+
+  const handleGenerateLink = () => {
+    const b64 = serializeConfig(cfg)
+    const url = `${window.location.origin}${window.location.pathname}?museum=${b64}`
+    setShareUrl(url)
+    setConfirmOpen(false)
+    setShareOpen(true)
+    audioManager.initSynth()
+    audioManager.playProximityChime()
+  }
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareUrl)
+      .then(() => {
+        setCopied(true)
+        audioManager.playProximityChime()
+        setTimeout(() => setCopied(false), 2000)
+      })
+      .catch(err => {
+        console.error('Falha ao copiar link:', err)
+      })
+  }
 
   const set = <K extends keyof MuseumConfig>(k: K, v: MuseumConfig[K]) =>
     setCfg(c => ({ ...c, [k]: v }))
@@ -145,13 +175,20 @@ export default function ConfigScreen({ onStart }: Props) {
               </h1>
               <p className="text-white/35 text-xs mt-1">Crie um álbum romântico cinematográfico e interativo</p>
             </div>
-            <button
-              onClick={() => onStart(cfg)}
-              className="btn-gradient hidden md:flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-bold shrink-0 mt-1"
-            >
-              <span>Entrar no Museu</span>
-              <span>→</span>
-            </button>
+            <div className="flex gap-2.5">
+              <button
+                onClick={() => onStart(cfg)}
+                className="px-4 py-2 rounded-xl text-white/70 hover:text-white border border-white/10 hover:bg-white/5 text-xs font-semibold shrink-0 mt-1 transition-all"
+              >
+                👁️ Testar Museu (Preview)
+              </button>
+              <button
+                onClick={() => setConfirmOpen(true)}
+                className="btn-gradient hidden md:flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-xs font-black tracking-wider uppercase shrink-0 mt-1 animate-glow-pulse"
+              >
+                <span>🔐 Gerar Link Único</span>
+              </button>
+            </div>
           </div>
         </header>
 
@@ -377,12 +414,21 @@ export default function ConfigScreen({ onStart }: Props) {
 
               {/* CTA mobile */}
               <div className="md:hidden">
-                <button
-                  onClick={() => onStart(cfg)}
-                  className="btn-gradient w-full py-4 rounded-2xl text-white font-bold text-base animate-glow-pulse"
-                >
-                  ❤️ Entrar no Nosso Museu Virtual
-                </button>
+                <div className="space-y-2.5">
+                  <button
+                    onClick={() => setConfirmOpen(true)}
+                    className="btn-gradient w-full py-4 rounded-2xl text-white font-bold text-base animate-glow-pulse flex items-center justify-center gap-2"
+                  >
+                    <span>🔐</span>
+                    <span>Finalizar & Gerar Link Único</span>
+                  </button>
+                  <button
+                    onClick={() => onStart(cfg)}
+                    className="w-full py-3 border border-white/10 hover:bg-white/5 rounded-2xl text-sm font-semibold text-white/70 transition-all"
+                  >
+                    👁️ Testar Modo Visualização
+                  </button>
+                </div>
               </div>
             </div>
           </ScrollArea>
@@ -398,20 +444,120 @@ export default function ConfigScreen({ onStart }: Props) {
             <LivePreview cfg={cfg} activePhoto={openPhoto >= 0 ? openPhoto : 0} />
 
             {/* CTA desktop */}
-            <div className="mt-4">
+            <div className="mt-4 space-y-2">
+              <button
+                onClick={() => setConfirmOpen(true)}
+                className="btn-gradient w-full py-4 rounded-2xl text-white font-bold text-sm animate-glow-pulse flex items-center justify-center gap-2"
+              >
+                <span>🔐</span>
+                <span>Finalizar & Gerar Link Único</span>
+              </button>
               <button
                 onClick={() => onStart(cfg)}
-                className="btn-gradient w-full py-4 rounded-2xl text-white font-bold text-sm animate-glow-pulse"
+                className="w-full py-2.5 border border-white/10 hover:bg-white/5 rounded-xl text-xs font-semibold text-white/70 transition-all"
               >
-                ❤️ Entrar no Museu
+                👁️ Testar Museu (Preview)
               </button>
               <p className="text-center text-[10px] text-white/20 mt-2">
-                Toque para entrar · O amor espera por vocês
+                Você pode editar livremente até gerar o link final!
               </p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Diálogo de Confirmação Romântica Crítica */}
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent
+          className="border-0 max-w-sm w-[92vw] text-white text-center p-6 rounded-2xl"
+          style={{ background: 'linear-gradient(135deg, #1c0a12, #0d0408)', boxShadow: '0 0 40px rgba(244,63,94,0.15)' }}
+        >
+          <div className="space-y-4">
+            <div className="text-4xl">🔐</div>
+            <h3 className="text-lg font-bold text-rose-300">
+              Tem certeza que deseja finalizar?
+            </h3>
+            <p className="text-xs text-white/60 leading-relaxed">
+              Esta ação gerará o link permanente e exclusivo do seu museu. Certifique-se de que todas as fotos, mensagens e o link do YouTube estão perfeitos, pois após a geração, este link se tornará vitalício e imutável para presentear o seu amor!
+            </p>
+            <div className="pt-2 flex gap-3">
+              <button
+                onClick={() => setConfirmOpen(false)}
+                className="flex-1 py-2.5 border border-white/10 rounded-xl text-xs font-semibold text-white/50 hover:bg-white/5 transition-all"
+              >
+                Revisar
+              </button>
+              <button
+                onClick={handleGenerateLink}
+                className="flex-1 py-2.5 bg-gradient-to-r from-rose-500 to-amber-500 rounded-xl text-xs font-black uppercase text-white shadow-lg shadow-rose-950/20 hover:scale-105 active:scale-95 transition-all"
+              >
+                Gerar Link ❤️
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Diálogo Final de Compartilhamento com QR Code */}
+      <Dialog open={shareOpen} onOpenChange={setShareOpen}>
+        <DialogContent
+          className="border-0 max-w-sm w-[92vw] text-white text-center p-6 rounded-2xl overflow-y-auto max-h-[85vh]"
+          style={{ background: 'linear-gradient(135deg, #0a0814, #120a1c)', boxShadow: '0 0 40px rgba(244,63,94,0.1)' }}
+        >
+          <div className="space-y-5">
+            <div className="text-4xl animate-bounce">🎁</div>
+            <h3 className="text-lg font-bold bg-gradient-to-r from-rose-400 to-amber-400 bg-clip-text text-transparent">
+              Seu Museu Foi Gerado!
+            </h3>
+            <p className="text-xs text-white/60 leading-relaxed">
+              O link exclusivo vitalício e o QR Code oficial de entrada já estão prontos. Agora você pode presentear quem você ama!
+            </p>
+
+            {/* QR Code */}
+            <div className="bg-white p-3 rounded-xl inline-block mx-auto shadow-xl">
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=120c12&data=${encodeURIComponent(shareUrl)}`}
+                alt="QR Code do Museu"
+                className="w-40 h-40 block object-contain"
+              />
+            </div>
+            <p className="text-[10px] text-white/30">Escaneie com a câmera do celular para abrir o museu</p>
+
+            {/* Link Input & Copy */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                readOnly
+                value={shareUrl}
+                className="bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-[9px] font-mono flex-1 min-w-0 text-white/70 text-left"
+                onClick={e => (e.target as HTMLInputElement).select()}
+              />
+              <button
+                onClick={handleCopyLink}
+                className="px-4 py-2.5 rounded-xl text-xs font-bold transition-all shrink-0 hover:scale-105 active:scale-95"
+                style={{ background: copied ? '#22c55e' : '#f43f5e', color: '#fff' }}
+              >
+                {copied ? '✓' : 'Copiar'}
+              </button>
+            </div>
+
+            <div className="pt-2 flex flex-col gap-2">
+              <button
+                onClick={() => window.print()}
+                className="w-full py-2.5 border border-white/15 rounded-xl text-xs font-semibold hover:bg-white/5 transition-all text-white/80"
+              >
+                🖨️ Imprimir Cartão Presente (Físico)
+              </button>
+              <button
+                onClick={() => setShareOpen(false)}
+                className="w-full py-2 text-white/40 hover:text-white/60 transition-colors text-xs"
+              >
+                Fechar Editor
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

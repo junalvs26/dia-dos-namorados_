@@ -9,14 +9,23 @@ import SplashScreen from './components/SplashScreen'
 import IntroScreen from './components/IntroScreen'
 import MuseumGallery from './components/MuseumGallery'
 import YouTubeAudioPlayer from './components/YouTubeAudioPlayer'
+import LandingPage from './components/LandingPage'
+import PaymentSuccess from './components/PaymentSuccess'
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>('config')
+  const [screen, setScreen] = useState<Screen>(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('museum')) return 'config' // Transitará no useEffect
+    if (params.get('status') === 'approved' && params.get('payment_id')) return 'payment-success'
+    if (localStorage.getItem('payment_verified_id')) return 'config'
+    return 'lp'
+  })
   const [cfg, setCfg] = useState<MuseumConfig>(DEFAULT_CONFIG)
   const [isSharedLink, setIsSharedLink] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
+  const [paymentId, setPaymentId] = useState('')
 
-  // Verifica na montagem se há dados do museu na URL
+  // Verifica na montagem se há dados do museu na URL ou status de compra
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const museumB64 = params.get('museum')
@@ -26,6 +35,19 @@ export default function App() {
         setCfg(decoded)
         setIsSharedLink(true)
         setScreen('splash') // Abre direto na tela de surpresa romântica
+      }
+    } else {
+      const status = params.get('status')
+      const pId = params.get('payment_id')
+      if (status === 'approved' && pId) {
+        setPaymentId(pId)
+        setScreen('payment-success')
+        // Limpa os parâmetros de pagamento da URL para ficar limpa e profissional
+        window.history.replaceState({}, document.title, window.location.pathname)
+      } else if (localStorage.getItem('payment_verified_id')) {
+        setScreen('config')
+      } else {
+        setScreen('lp')
       }
     }
   }, [])
@@ -54,6 +76,12 @@ export default function App() {
 
   return (
     <>
+      {screen === 'lp' && (
+        <LandingPage />
+      )}
+      {screen === 'payment-success' && (
+        <PaymentSuccess paymentId={paymentId} onContinue={() => setScreen('config')} />
+      )}
       {screen === 'config' && (
         <ConfigScreen onStart={handleStart} />
       )}
@@ -67,11 +95,11 @@ export default function App() {
         <IntroScreen texts={cfg.introTexts} onDone={() => setScreen('museum')} />
       )}
       {screen === 'museum' && (
-        <MuseumGallery cfg={cfg} onExit={handleExit} isMuted={isMuted} setIsMuted={setIsMuted} />
+        <MuseumGallery cfg={cfg} onExit={handleExit} isMuted={isMuted} setIsMuted={setIsMuted} isSharedLink={isSharedLink} />
       )}
       <YouTubeAudioPlayer
         url={cfg.customMusicUrl}
-        isPlaying={screen !== 'config' && screen !== 'loading'}
+        isPlaying={screen !== 'lp' && screen !== 'payment-success' && screen !== 'config' && screen !== 'loading'}
         isMuted={isMuted}
       />
     </>

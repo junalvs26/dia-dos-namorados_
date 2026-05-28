@@ -1,4 +1,4 @@
-export type Screen = 'config' | 'loading' | 'splash' | 'intro' | 'museum'
+export type Screen = 'lp' | 'payment-success' | 'config' | 'loading' | 'splash' | 'intro' | 'museum'
 
 export type Vibe = 'classic' | 'cozy' | 'retro' | 'anime' | 'disney' | 'studios'
 export type Weather = 'stars' | 'rain' | 'aurora' | 'none'
