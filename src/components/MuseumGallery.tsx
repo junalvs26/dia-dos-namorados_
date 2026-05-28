@@ -83,6 +83,7 @@ export default function MuseumGallery({ cfg, onExit, isMuted, setIsMuted }: Prop
   }
 
   const handlePointerMove = (e: React.PointerEvent) => {
+    if (e.pointerType !== 'mouse') return
     const w = window.innerWidth
     const h = window.innerHeight
     const relX = (e.clientX - w / 2) / (w / 2)
@@ -162,12 +163,16 @@ export default function MuseumGallery({ cfg, onExit, isMuted, setIsMuted }: Prop
 
         <div className="flex flex-col items-center min-w-0">
           <span
-            className="text-xs md:text-sm font-bold text-white truncate max-w-[140px] md:max-w-none"
-            style={{ fontFamily: theme.nameFont, textShadow: `0 0 20px ${theme.accent}60` }}
+            className="text-sm md:text-lg font-black tracking-widest uppercase truncate max-w-[180px] md:max-w-none animate-fade-in"
+            style={{ 
+              fontFamily: theme.nameFont, 
+              color: theme.accent,
+              textShadow: `0 0 8px ${theme.accent}80, 0 0 20px ${theme.accent}40`,
+            }}
           >
-            {cfg.partner1} & {cfg.partner2}
+            {cfg.partner1} ❤️ {cfg.partner2}
           </span>
-          <span className="text-[9px] md:text-[10px] font-mono" style={{ color: theme.accent + 'cc' }}>
+          <span className="text-[9px] md:text-[10px] font-mono mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>
             ⏱ {timer}
           </span>
         </div>
