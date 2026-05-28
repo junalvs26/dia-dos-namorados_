@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
-import type { MuseumConfig, AvatarConfig, Vibe, Weather, Frame, Music, Gender, Hair, HairColor, Outfit, Accessory } from '../types'
+import type { MuseumConfig, AvatarConfig, Vibe, Weather, Frame, Gender, Hair, HairColor, Outfit, Accessory } from '../types'
 import { DEFAULT_CONFIG } from '../lib/defaults'
-import { VIBE_LABELS, WEATHER_LABELS, FRAME_LABELS, MUSIC_LABELS } from '../lib/themes'
+import { VIBE_LABELS, WEATHER_LABELS, FRAME_LABELS } from '../lib/themes'
 import { Label } from './ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { ScrollArea } from './ui/scroll-area'
@@ -224,70 +224,23 @@ export default function ConfigScreen({ onStart }: Props) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {selField('Vibe / Estilo', cfg.vibe, VIBE_LABELS, v => set('vibe', v as Vibe))}
                   {selField('Atmosfera', cfg.weather, WEATHER_LABELS, v => set('weather', v as Weather))}
-                  {selField('Molduras dos Quadros', cfg.frame, FRAME_LABELS, v => set('frame', v as Frame))}
-                  {selField('Trilha Sonora', cfg.music, MUSIC_LABELS, v => set('music', v as Music))}
-                </div>
-
-                {cfg.music === 'custom' && (
-                  <div className="mt-4 p-4 glass rounded-xl space-y-4 border border-rose-500/20 animate-fade-up animation-fill-both">
-                    <p className="text-xs font-semibold text-rose-300">🎵 Configurar Música Personalizada</p>
-                    
-                    <div className="grid grid-cols-1 gap-4">
-                      {/* Option A: Direct MP3 URL */}
-                      <div className="space-y-1.5">
-                        <Label className="text-[10px] font-bold tracking-widest uppercase text-white/40">Link Direto da Música (.MP3)</Label>
-                        <input
-                          type="text"
-                          className={inp}
-                          value={cfg.customMusicUrl || ''}
-                          onChange={e => set('customMusicUrl', e.target.value)}
-                          placeholder="Ex: https://meusite.com/musica.mp3"
-                        />
-                        <p className="text-[9px] text-white/30 leading-normal">
-                          💡 **Recomendado para Compartilhar**: Cole um link direto para um arquivo MP3 público (ex: do Google Drive público, Dropbox com dl=1, ou Archive.org). Isso permite que a música toque no celular de quem receber o link!
-                        </p>
-                      </div>
-
-                      {/* Option B: Local MP3 upload */}
-                      <div className="space-y-1.5">
-                        <Label className="text-[10px] font-bold tracking-widest uppercase text-white/40">Ou Enviar Arquivo Local (.MP3)</Label>
-                        <div className="flex gap-3 items-center">
-                          <button
-                            type="button"
-                            onClick={() => document.getElementById('audio-upload-input')?.click()}
-                            className="px-4 py-2 border border-dashed border-white/20 rounded-lg text-xs hover:border-rose-400 hover:text-rose-400 transition-all cursor-pointer bg-white/3 text-white"
-                          >
-                            📁 {cfg.customMusicDataUrl ? '🔄 Trocar MP3 Enviado' : 'Carregar MP3 Local'}
-                          </button>
-                          <input
-                            id="audio-upload-input"
-                            type="file"
-                            accept="audio/mp3,audio/*"
-                            className="hidden"
-                            onChange={e => {
-                              const file = e.target.files?.[0]
-                              if (file) {
-                                const reader = new FileReader()
-                                reader.onload = ev => {
-                                  set('customMusicDataUrl', ev.target?.result as string)
-                                }
-                                reader.readAsDataURL(file)
-                              }
-                            }}
-                          />
-                          {cfg.customMusicDataUrl && (
-                            <span className="text-[10px] text-green-400 flex items-center gap-1">
-                              ✓ MP3 Carregado ({Math.round(cfg.customMusicDataUrl.length * 0.75 / 1024 / 1024 * 10) / 10} MB)
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[9px] text-white/30 leading-normal">
-                          ⚠️ **Aviso de Tamanho**: Arquivos de áudio são muito grandes. Ao usar um arquivo local, ele funcionará perfeitamente **neste computador**, mas não poderá ser anexado ao link de compartilhamento. Para links compartilhados, recomendamos usar o "Link Direto" acima!
-                        </p>
-                      </div>
-                    </div>
+                  <div className="sm:col-span-2">
+                    {selField('Molduras dos Quadros', cfg.frame, FRAME_LABELS, v => set('frame', v as Frame))}
                   </div>
-                )}
+                  <div className="sm:col-span-2 space-y-1.5 mt-2 animate-fade-up animation-fill-both">
+                    <Label className="text-[10px] font-bold tracking-widest uppercase text-white/30">Música de Fundo (Link do YouTube)</Label>
+                    <input
+                      type="text"
+                      className={inp}
+                      value={cfg.customMusicUrl || ''}
+                      onChange={e => set('customMusicUrl', e.target.value)}
+                      placeholder="Cole o link do YouTube (ex: https://www.youtube.com/watch?v=...)"
+                    />
+                    <p className="text-[9px] text-white/35 leading-normal mt-0.5">
+                      🎵 **Trilha Sonora Exclusiva**: O museu tocará em segundo plano apenas o áudio do vídeo do YouTube que você colocar! Cole qualquer música ou playlist romântica.
+                    </p>
+                  </div>
+                </div>
               </section>
 
               <div className="h-px bg-gradient-to-r from-transparent via-white/6 to-transparent" />

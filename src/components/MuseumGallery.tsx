@@ -14,15 +14,19 @@ import FrameOverlay from './FrameOverlay'
 
 const ROOM_EMOJIS = ['🌹','💫','🎭','🗺️','🏡','🌸','⭐','🌙','💍','🏛️']
 
-interface Props { cfg: MuseumConfig; onExit: () => void }
+interface Props { 
+  cfg: MuseumConfig
+  onExit: () => void
+  isMuted: boolean
+  setIsMuted: React.Dispatch<React.SetStateAction<boolean>>
+}
 
-export default function MuseumGallery({ cfg, onExit }: Props) {
+export default function MuseumGallery({ cfg, onExit, isMuted, setIsMuted }: Props) {
   const [slide, setSlide] = useState(0)
   const [letterOpen, setLetterOpen] = useState(false)
   const [quizOpen, setQuizOpen] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [soundOn, setSoundOn] = useState(!audioManager.getIsMuted())
   const [hintsVisible, setHintsVisible] = useState(true)
   const [transitioning, setTransitioning] = useState(false)
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
@@ -92,9 +96,9 @@ export default function MuseumGallery({ cfg, onExit }: Props) {
 
   // Alterna o áudio entre mudo e ativo de forma suave
   const handleSoundToggle = () => {
-    const nextMute = soundOn // se está ativo, o próximo estado de mudo é true
+    const nextMute = !isMuted
     audioManager.setMute(nextMute)
-    setSoundOn(!soundOn)
+    setIsMuted(nextMute)
   }
 
   // Gera o link codificado Base64 para compartilhamento
@@ -198,7 +202,7 @@ export default function MuseumGallery({ cfg, onExit }: Props) {
             className="px-2 py-1.5 rounded-lg text-xs text-white/40 hover:text-white/70 transition-colors"
             style={{ border: '1px solid rgba(255,255,255,0.08)' }}
           >
-            {soundOn ? '🔊' : '🔇'}
+            {!isMuted ? '🔊' : '🔇'}
           </button>
         </div>
       </div>

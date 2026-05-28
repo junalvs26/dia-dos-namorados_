@@ -8,11 +8,13 @@ import LoaderScreen from './components/LoaderScreen'
 import SplashScreen from './components/SplashScreen'
 import IntroScreen from './components/IntroScreen'
 import MuseumGallery from './components/MuseumGallery'
+import YouTubeAudioPlayer from './components/YouTubeAudioPlayer'
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('config')
   const [cfg, setCfg] = useState<MuseumConfig>(DEFAULT_CONFIG)
   const [isSharedLink, setIsSharedLink] = useState(false)
+  const [isMuted, setIsMuted] = useState(false)
 
   // Verifica na montagem se há dados do museu na URL
   useEffect(() => {
@@ -35,9 +37,8 @@ export default function App() {
   }
 
   const handleEnterFromSplash = () => {
-    // Inicializa a Web Audio API e começa a trilha sonora com interação do usuário
+    // Inicializa a Web Audio API para os sinos sintéticos
     audioManager.initSynth()
-    audioManager.playSelection(cfg.music, cfg.vibe, cfg.customMusicDataUrl || cfg.customMusicUrl)
     setScreen('intro')
   }
 
@@ -66,8 +67,13 @@ export default function App() {
         <IntroScreen texts={cfg.introTexts} onDone={() => setScreen('museum')} />
       )}
       {screen === 'museum' && (
-        <MuseumGallery cfg={cfg} onExit={handleExit} />
+        <MuseumGallery cfg={cfg} onExit={handleExit} isMuted={isMuted} setIsMuted={setIsMuted} />
       )}
+      <YouTubeAudioPlayer
+        url={cfg.customMusicUrl}
+        isPlaying={screen !== 'config' && screen !== 'loading'}
+        isMuted={isMuted}
+      />
     </>
   )
 }
