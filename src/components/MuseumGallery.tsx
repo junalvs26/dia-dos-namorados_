@@ -3,8 +3,6 @@ import type { MuseumConfig } from '../types'
 import { VIBE_THEMES, FRAME_STYLES, FRAME_SHADOWS, FRAME_EXTRA } from '../lib/themes'
 import { useTimer } from '../hooks/useTimer'
 import { audioManager } from '../lib/audio'
-import { serializeConfig } from '../lib/sharing'
-import { Dialog, DialogContent } from './ui/dialog'
 import ParticleCanvas from './ParticleCanvas'
 import ChibiCanvas from './ChibiCanvas'
 import VibeScenery from './VibeScenery'
@@ -26,8 +24,6 @@ export default function MuseumGallery({ cfg, onExit, isMuted, setIsMuted, isShar
   const [slide, setSlide] = useState(0)
   const [letterOpen, setLetterOpen] = useState(false)
   const [quizOpen, setQuizOpen] = useState(false)
-  const [shareOpen, setShareOpen] = useState(false)
-  const [copied, setCopied] = useState(false)
   const [hintsVisible, setHintsVisible] = useState(true)
   const [transitioning, setTransitioning] = useState(false)
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
@@ -103,30 +99,10 @@ export default function MuseumGallery({ cfg, onExit, isMuted, setIsMuted, isShar
     setIsMuted(nextMute)
   }
 
-  // Gera o link codificado Base64 para compartilhamento
-  const getShareUrl = () => {
-    const b64 = serializeConfig(cfg)
-    return `${window.location.origin}${window.location.pathname}?museum=${b64}`
-  }
-
-  const handleCopyLink = () => {
-    const url = getShareUrl()
-    navigator.clipboard.writeText(url)
-      .then(() => {
-        setCopied(true)
-        audioManager.playProximityChime()
-        setTimeout(() => setCopied(false), 2000)
-      })
-      .catch(err => {
-        console.error('Falha ao copiar link:', err)
-      })
-  }
-
   const photo = cfg.photos[slide]
   const frameStyle = FRAME_STYLES[cfg.frame]
   const frameShadow = FRAME_SHADOWS[cfg.frame]
   const frameExtra = FRAME_EXTRA[cfg.frame] ?? {}
-  const shareUrl = getShareUrl()
 
   return (
     <div
@@ -192,19 +168,6 @@ export default function MuseumGallery({ cfg, onExit, isMuted, setIsMuted, isShar
               title="Carta Secreta"
             >
               💌
-            </button>
-          )}
-          {!isSharedLink && (
-            <button
-              onClick={() => {
-                audioManager.playProximityChime()
-                setShareOpen(true)
-              }}
-              className="px-2 py-1.5 rounded-lg text-[10px] md:text-xs font-bold text-white/80 hover:text-white transition-all hover:scale-105 active:scale-95 flex items-center gap-1"
-              style={{ background: `${theme.accent}25`, border: `1px solid ${theme.accent}45` }}
-            >
-              <span>🔗</span>
-              <span className="hidden sm:inline">Compartilhar</span>
             </button>
           )}
           <button
@@ -399,65 +362,6 @@ export default function MuseumGallery({ cfg, onExit, isMuted, setIsMuted, isShar
       />
 
       {/* Compartilhar Modal */}
-      <Dialog open={shareOpen} onOpenChange={v => { if (!v) setShareOpen(false) }}>
-        <DialogContent
-          className="border-0 max-w-sm w-[92vw] text-white text-center p-6 rounded-2xl overflow-y-auto max-h-[85vh]"
-          style={{ background: 'linear-gradient(135deg, #100820, #1e0c28)', boxShadow: `0 0 50px ${theme.accent}30` }}
-        >
-          <div className="space-y-5">
-            <div className="text-4xl">🎁</div>
-            <h3 className="text-lg font-bold" style={{ fontFamily: theme.nameFont, color: theme.accent }}>
-              Compartilhar Nosso Museu
-            </h3>
-            <p className="text-xs text-white/60 leading-relaxed">
-              Envie este link especial para o seu amor. Ao abrir, ele(a) receberá a surpresa romântica e as fotos exatamente como você configurou!
-            </p>
-
-            {/* QR Code Container */}
-            <div className="bg-white p-3 rounded-xl inline-block mx-auto shadow-xl">
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=120c12&data=${encodeURIComponent(shareUrl)}`}
-                alt="QR Code do Museu"
-                className="w-44 h-44 block object-contain"
-              />
-            </div>
-            <p className="text-[10px] text-white/30">Escaneie com a câmera do celular para abrir</p>
-
-            {/* Link Input & Copy */}
-            <div className="flex gap-2">
-              <input
-                type="text"
-                readOnly
-                value={shareUrl}
-                className="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-[10px] font-mono flex-1 min-w-0 text-white/70 text-left cursor-text"
-                onClick={e => (e.target as HTMLInputElement).select()}
-              />
-              <button
-                onClick={handleCopyLink}
-                className="px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 hover:scale-105 active:scale-95"
-                style={{ background: copied ? '#22c55e' : theme.accent, color: copied ? '#fff' : '#000' }}
-              >
-                {copied ? '✓ Copiado!' : 'Copiar'}
-              </button>
-            </div>
-
-            <div className="pt-2 flex flex-col gap-2">
-              <button
-                onClick={() => window.print()}
-                className="w-full py-2.5 border border-white/15 rounded-xl text-xs font-semibold hover:bg-white/5 transition-all text-white/80"
-              >
-                🖨️ Imprimir Presente (Físico)
-              </button>
-              <button
-                onClick={() => setShareOpen(false)}
-                className="w-full py-2 text-white/40 hover:text-white/60 transition-colors text-xs"
-              >
-                Voltar ao Museu
-              </button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
