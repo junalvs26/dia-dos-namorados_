@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { AvatarConfig } from '../types'
 
 /* ── Color palettes (Hand-drawn pastel crayon style) ─────── */
@@ -358,7 +359,7 @@ function Accessory({ type }: { type: string }) {
   }
 }
 
-function ChibiSVG({ cfg, facing = 'right', width = 90 }: { cfg: AvatarConfig; facing?: 'right'|'left'; width?: number }) {
+const ChibiSVG = memo(function ChibiSVG({ cfg, facing = 'right', width = 90 }: { cfg: AvatarConfig; facing?: 'right'|'left'; width?: number }) {
   const flip = facing === 'left' ? 'scale(-1,1) translate(-100,0)' : undefined
 
   return (
@@ -420,12 +421,11 @@ function ChibiSVG({ cfg, facing = 'right', width = 90 }: { cfg: AvatarConfig; fa
       </g>
     </svg>
   )
-}
+})
 
-/* ── Couple display (used in gallery + preview) ─────────── */
 interface Props { p1: AvatarConfig; p2: AvatarConfig; size?: number }
 
-export default function ChibiCanvas({ p1, p2, size = 90 }: Props) {
+const ChibiCanvas = memo(function ChibiCanvas({ p1, p2, size = 90 }: Props) {
   const totalW = size * 2.5
   const totalH = size * 1.48
 
@@ -456,4 +456,7 @@ export default function ChibiCanvas({ p1, p2, size = 90 }: Props) {
       <ChibiSVG cfg={p2} facing="left" width={size} />
     </div>
   )
-}
+})
+
+export default ChibiCanvas
+
