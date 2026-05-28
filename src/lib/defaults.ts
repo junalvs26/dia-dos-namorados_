@@ -1,0 +1,36 @@
+import type { MuseumConfig } from '../types'
+
+export const DEFAULT_CONFIG: MuseumConfig = {
+  partner1: 'João',
+  partner2: 'Maria',
+  startDate: '2024-06-12',
+  loveLetter: 'Meu amor, cada instante ao seu lado é um presente valioso. Criei este museu para celebrar a nossa história e expressar o quanto você é importante para mim. Quero continuar caminhando e escrevendo todos os próximos capítulos da nossa vida de mãos dadas com você. Te amo para sempre! ❤️',
+  vibe: 'classic',
+  weather: 'stars',
+  frame: 'gold',
+  music: 'theme',
+  p1: { gender: 'male', hair: 'short', hairColor: 'black', outfit: 'blue', accessory: 'none' },
+  p2: { gender: 'female', hair: 'long', hairColor: 'brown', outfit: 'yellow', accessory: 'none' },
+  photos: [
+    { title: 'O Nosso Começo', desc: 'Desde o primeiro instante, soube que minha vida mudaria para sempre. O seu sorriso iluminou o meu caminho e hoje não consigo imaginar um segundo sequer sem você ao meu lado.', dataUrl: null },
+    { title: 'Sorrisos Compartilhados', desc: 'Cada risada dividida é um tesouro que guardo no peito. A facilidade com que a gente se entende e a alegria que você transmite transformam qualquer dia comum no momento mais feliz.', dataUrl: null },
+    { title: 'Nossa Sintonia', desc: 'A gente se entende apenas com um olhar. Essa conexão tão profunda, cheia de carinho, respeito e cumplicidade, é o que faz o nosso amor ser tão forte, único e indestrutível.', dataUrl: null },
+    { title: 'Aventuras Lado a Lado', desc: 'Qualquer jornada se torna mágica quando é com você. Que a vida continue nos presenteando com estradas lindas para percorrermos sempre juntos.', dataUrl: null },
+    { title: 'Meu Porto Seguro', desc: 'Nos dias difíceis, o seu abraço é a minha calmaria. Obrigado por ser meu porto seguro, por acreditar em mim mesmo quando eu duvido e por segurar minha mão com tanta força.', dataUrl: null },
+    { title: 'Pequenos Detalhes', desc: 'Adoro o jeito como você arruma meu cabelo, a doçura da sua voz ao acordar e como seus olhos brilham quando estamos rindo de bobagens. Você é feita de pura poesia.', dataUrl: null },
+    { title: 'Sonhos Realizados', desc: 'Celebrar cada pequena ou grande conquista nossa é a melhor parte de dividir a vida com você. Ao seu lado, sinto que nenhum sonho é grande demais para nós.', dataUrl: null },
+    { title: 'Aconchego e Paz', desc: 'Seu peito é o melhor lugar do mundo para deitar minha cabeça e esquecer o barulho lá fora. Com você, o silêncio também é uma das nossas conversas mais bonitas.', dataUrl: null },
+    { title: 'Cuidado Diário', desc: 'Prometo te cuidar em cada amanhecer, te trazer um café quente nos dias frios e ser a pessoa que vai sempre te lembrar de quão incrível e forte você é.', dataUrl: null },
+    { title: 'Para Sempre Nós', desc: 'Olho para trás com profunda gratidão e para frente com uma certeza imensa: quero construir uma vida inteira com você. Envelhecer ao seu lado e continuar te amando cada dia mais.', dataUrl: null },
+  ],
+  introTexts: [
+    'Para o meu amor... ❤️',
+    'Nossos caminhos se cruzaram de uma forma mágica.',
+    'E hoje, cada segundo ao seu lado é uma lembrança eterna.',
+    'Criei este museu virtual secreto especialmente para nós.',
+    'Um lugar para guardarmos nossas risadas, nossas fotos e nosso carinho.',
+    'Abra seu coração e viaje no nosso tempo...',
+  ],
+  customMusicUrl: '',
+  customMusicDataUrl: '',
+}
