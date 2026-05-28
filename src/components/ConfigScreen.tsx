@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react'
 import type { MuseumConfig, AvatarConfig, Vibe, Weather, Frame, Gender, Hair, HairColor, Outfit, Accessory } from '../types'
-import { DEFAULT_CONFIG } from '../lib/defaults'
 import { VIBE_LABELS, WEATHER_LABELS, FRAME_LABELS } from '../lib/themes'
 import { Label } from './ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
@@ -11,7 +10,11 @@ import { Dialog, DialogContent } from './ui/dialog'
 import { serializeConfig } from '../lib/sharing'
 import { audioManager } from '../lib/audio'
 
-interface Props { onStart: (cfg: MuseumConfig) => void }
+interface Props {
+  cfg: MuseumConfig
+  setCfg: React.Dispatch<React.SetStateAction<MuseumConfig>>
+  onStart: (cfg: MuseumConfig) => void
+}
 
 const PHOTO_HEADERS = [
   'O Início de Tudo','Momentos Felizes','Cumplicidade','Aventuras Juntos','O Apoio Mútuo',
@@ -60,8 +63,7 @@ function SectionHeader({ num, title }: { num: string; title: string }) {
   )
 }
 
-export default function ConfigScreen({ onStart }: Props) {
-  const [cfg, setCfg] = useState<MuseumConfig>(DEFAULT_CONFIG)
+export default function ConfigScreen({ cfg, setCfg, onStart }: Props) {
   const [openPhoto, setOpenPhoto] = useState<number>(0)
   const fileRefs = useRef<(HTMLInputElement | null)[]>([])
 

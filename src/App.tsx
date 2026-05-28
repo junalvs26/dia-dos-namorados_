@@ -20,10 +20,37 @@ export default function App() {
     if (localStorage.getItem('payment_verified_id')) return 'config'
     return 'lp'
   })
-  const [cfg, setCfg] = useState<MuseumConfig>(DEFAULT_CONFIG)
+  
   const [isSharedLink, setIsSharedLink] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
   const [paymentId, setPaymentId] = useState('')
+
+  const [cfg, setCfg] = useState<MuseumConfig>(() => {
+    const params = new URLSearchParams(window.location.search)
+    const museumB64 = params.get('museum')
+    if (museumB64) {
+      const decoded = deserializeConfig(museumB64)
+      if (decoded) return decoded
+    }
+    try {
+      const draft = localStorage.getItem('museum_draft')
+      if (draft) return JSON.parse(draft)
+    } catch (e) {
+      console.error("Falha ao ler rascunho do museu:", e)
+    }
+    return DEFAULT_CONFIG
+  })
+
+  // Salva o rascunho no localStorage sempre que o cfg mudar e não for link compartilhado
+  useEffect(() => {
+    if (!isSharedLink) {
+      try {
+        localStorage.setItem('museum_draft', JSON.stringify(cfg))
+      } catch (e) {
+        console.error("Falha ao salvar rascunho do museu:", e)
+      }
+    }
+  }, [cfg, isSharedLink])
 
   // Verifica na montagem se há dados do museu na URL ou status de compra
   useEffect(() => {
@@ -83,7 +110,7 @@ export default function App() {
         <PaymentSuccess paymentId={paymentId} onContinue={() => setScreen('config')} />
       )}
       {screen === 'config' && (
-        <ConfigScreen onStart={handleStart} />
+        <ConfigScreen cfg={cfg} setCfg={setCfg} onStart={handleStart} />
       )}
       {screen === 'loading' && (
         <LoaderScreen onDone={() => setScreen('splash')} />

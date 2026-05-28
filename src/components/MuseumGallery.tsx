@@ -194,17 +194,19 @@ export default function MuseumGallery({ cfg, onExit, isMuted, setIsMuted, isShar
               💌
             </button>
           )}
-          <button
-            onClick={() => {
-              audioManager.playProximityChime()
-              setShareOpen(true)
-            }}
-            className="px-2 py-1.5 rounded-lg text-[10px] md:text-xs font-bold text-white/80 hover:text-white transition-all hover:scale-105 active:scale-95 flex items-center gap-1"
-            style={{ background: `${theme.accent}25`, border: `1px solid ${theme.accent}45` }}
-          >
-            <span>🔗</span>
-            <span className="hidden sm:inline">Compartilhar</span>
-          </button>
+          {!isSharedLink && (
+            <button
+              onClick={() => {
+                audioManager.playProximityChime()
+                setShareOpen(true)
+              }}
+              className="px-2 py-1.5 rounded-lg text-[10px] md:text-xs font-bold text-white/80 hover:text-white transition-all hover:scale-105 active:scale-95 flex items-center gap-1"
+              style={{ background: `${theme.accent}25`, border: `1px solid ${theme.accent}45` }}
+            >
+              <span>🔗</span>
+              <span className="hidden sm:inline">Compartilhar</span>
+            </button>
+          )}
           <button
             onClick={handleSoundToggle}
             className="px-2 py-1.5 rounded-lg text-xs text-white/40 hover:text-white/70 transition-colors"
